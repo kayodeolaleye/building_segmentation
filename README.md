@@ -43,9 +43,13 @@ You can clone the repository using the command: `git clone https://github.com/ka
 
 ### Running it
 `$ cd building_segmentation_count/src`
+
 `$ mkdir data`
+
 `$ python buildingNets.py --setup`
+
 `$ python buildingNets.py -p`
+
 `$ python buildingNets.py -a 'one_layer' -i -t -E -C -T -v -e`
 
 ## Acknowledgements
