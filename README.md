@@ -2,7 +2,7 @@
 
 Using publicly available high resolution dataset, a shallow CNN is trained to label buildings in an held out samples.
 
-![Figure 1](/images/R1.tif)
+![Figure 1](/images/R1.jpg)
 
 The picture is part of an example output of the classifier. The green parts are true positives, the red parts are false positives, the blue parts are false negatives and the rest are true negatives. With only 20 minutes of training I was able to train a classifier which has 96.38 % accuracy, 74.2 % precision and 49.04 % recall. As mentioned above, my goal was not to find the best classifier for this task but more to give an example of a simple architecture which allows to train a neural net on aerial data. 
 
@@ -43,9 +43,13 @@ You can clone the repository using the command: `git clone https://github.com/ka
 
 ### Running it
 `$ cd building_segmentation_count/src`
+
 `$ mkdir data`
+
 `$ python buildingNets.py --setup`
+
 `$ python buildingNets.py -p`
+
 `$ python buildingNets.py -a 'one_layer' -i -t -E -C -T -v -e`
 
 ## Acknowledgements
