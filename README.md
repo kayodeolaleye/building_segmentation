@@ -4,7 +4,7 @@ Using publicly available high resolution dataset, a shallow CNN is trained to la
 
 ![Figure 1](/images/R1.jpg)
 
-The picture is part of an example output of the classifier. The green parts are true positives, the red parts are false positives, the blue parts are false negatives and the rest are true negatives. With only 20 minutes of training I was able to train a classifier which has 96.38 % accuracy, 74.2 % precision and 49.04 % recall. As mentioned above, my goal was not to find the best classifier for this task but more to give an example of a simple architecture which allows to train a neural net on aerial data. 
+The picture is part of an example output of the classifier. The green parts are true positives, the red parts are false positives, the blue parts are false negatives and the rest are true negatives. On test set: 86.82% accuracy, 76.72% precision and 66.62% recall.
 
 
 ### Getting the data
