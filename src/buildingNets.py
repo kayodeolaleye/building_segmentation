@@ -60,7 +60,7 @@ def create_parser():
         "-a", "--architecture",
         dest="architecture",
         default=False,
-        choices=["one_layer", "two_layer", "one_layer_pool_2", "one_layer_pool_3", "one_layer_pool_4", "one_layer_filter_12",
+        choices=["one_layer", "mnih", "two_layer", "one_layer_pool_2", "one_layer_pool_3", "one_layer_pool_4", "one_layer_filter_12",
                 "one_layer_filter_16", "one_layer_filter_20", "two_layer_pool_2", "two_layer_pool_3", "two_layer_pool_4",
                 "two_layer_filter_3", "two_layer_filter_4", "two_layer_filter_5", "two_layer_filter_6"],
         help="Neural net architecture.")
@@ -212,8 +212,33 @@ def main():
         ("decay", 0.0)
         ]
     
+    hyperparameters_mnih = [
+        ("architecture", args.architecture),
+        # Hyperparameters for the first convolutional layer.
+        ("nb_filters_1", 64),
+        ("filter_size_1", 16),
+        ("stride_1", (4, 4)),
+        # Hyperparameter for the first pooling layer.
+        ("pool_size_1", (2, 2)),
+        # Hyperparameter for the second convolutional layer).
+        ("nb_filters_2", 112),
+        ("filter_size_2", 4),
+        ("stride_2", (1, 1)),
+         # Hyperparameter for the third convolutional layer).
+        ("nb_filters_3", 80),
+        ("filter_size_3", 3),
+        ("stride_3", (1, 1)),
+         # Hyperparameter for the fourth hidden layer (FC)).
+        ("nb_units_4", args.patch_size),
+     
+        # Hyperparameters for Stochastic Gradient Descent.
+        ("learning_rate", 0.05),
+        ("momentum", 0.9),
+        ("decay", 0.0)
+        ]
+    
     if args.init_model:
-        model = init_model(args.patch_size, model_id, **dict(hyperparameters))
+        model = init_model(args.patch_size, model_id, **dict(hyperparameters_mnih))
         save_model_summary(hyperparameters, model, model_dir)
     elif args.train_model or args.evaluate_model:
         hyperparameters = dict(hyperparameters)

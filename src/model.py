@@ -56,7 +56,7 @@ def train_model(model, features, labels, patch_size, model_id, out_path,
     callbacks = [c for c in [earlystopper, checkpointer, tensorboarder] if c]
     
     print("Start training.")
-    history = model.fit(X, y, epochs=nb_epoch, callbacks=callbacks, validation_split=0.25)#changed validation_split from 0.1 to 0.25
+    history = model.fit(X, y, epochs=nb_epoch, callbacks=callbacks, validation_split=0.25)
     plot_history(history, out_path)
 
     save_model(model, model_dir)
@@ -114,13 +114,7 @@ def fcn_32s(patch_size, num_channels):
     x = Flatten()(x)
     x = Dense(patch_size * patch_size)(x)
     x = Activation('sigmoid')(x)
-    #x = Conv2DTranspose(filters=nb_classes, 
-     #                   kernel_size=(64, 64),
-      #                  strides=(32, 32),
-       #                 padding='same',
-        #                activation='sigmoid',
-         #               kernel_initializer=Constant(bilinear_upsample_weights(32, nb_classes)))(x)
-    #print(x.shape)
+
     model = Model(inputs=inputs, outputs=x)
     #model.summary()
     for layer in model.layers[:15]:
@@ -129,9 +123,9 @@ def fcn_32s(patch_size, num_channels):
 
 def init_model(patch_size, model_id, architecture='one_layer',
                nb_filters_1=64, filter_size_1=12,
-               stride_1=(4, 4), pool_size_1=(3,3),
-               nb_filters_2=128, filter_size_2=4,
-               stride_2=(1,1), learning_rate=0.05,
+               stride_1=(4, 4), nb_filters_2=128, filter_size_2=4,
+               stride_2=(1,1), nb_filters_3=64, filter_size_3=12,
+               stride_3=(4, 4), learning_rate=0.05,
                momentum=0.9, decay=0.0):
     """ Initialise a new model with the given hyperparameters and save it for later use. """
     
@@ -152,15 +146,9 @@ def init_model(patch_size, model_id, architecture='one_layer',
         model.add(Dense(patch_size * patch_size))
         model.add(Activation('sigmoid'))
         
-            
-        #model.add(Flatten())
-        #model.add(Dense(patch_size * patch_size))
-        #model.add(Dense(patch_size * patch_size * 3))
-        #model.add(Activation('sigmoid'))
-        #use softmax with categorical cross entropy for multi-class classification task
         #-----------------------------------------------------------------------------------------
         
-    elif architecture == 'two_layer':
+    elif architecture == 'mnih':
         model.add(
             Conv2D(
                 nb_filters_1, filter_size_1,
@@ -173,8 +161,15 @@ def init_model(patch_size, model_id, architecture='one_layer',
                 nb_filters_2, filter_size_2,
                 filter_size_2, subsample=stride_2))
         model.add(Activation('relu'))
+        model.add(
+            Conv2D(
+                nb_filters_3, filter_size_3,
+                filter_size_3, subsample=stride_3))
+        model.add(Activation('relu'))
         model.add(Flatten())
         model.add(Dense(patch_size * patch_size))
+        model.add(Activation('relu'))
+        model.add(Dense(256))
         model.add(Activation('sigmoid'))
   
    
@@ -213,21 +208,7 @@ def compile_model(model, learning_rate, momentum, decay):
 
 def normalise_input(features):
     """ Normalise the features such that all values are in the range [0,1]. """
-    #split1,split2,split3,split4,split5,split6,split7,split8,split9,split10 = np.array_split(features,10)
-    #del features
-    #split1 = split1.astype(np.float32)
-    #split2 = split2.astype(np.float32)
-    #split3 = split3.astype(np.float32)
-    #split4 = split4.astype(np.float32)
-    #split5 = split5.astype(np.float32)
-    #split6 = split6.astype(np.float32)
-    #split7 = split7.astype(np.float32)
-    #split8 = split8.astype(np.float32)
-    #split9 = split9.astype(np.float32)
-    #split10 = split10.astype(np.float32)
-    #features = np.hstack(split1,split2,split3,split4,split5,split6,split7,split8,split9,split10)
     features = np.array(features,dtype=np.float32)    
-
     return np.multiply(features, 1.0 / 255.0)
 
 def mnih_normalise_input(features):
