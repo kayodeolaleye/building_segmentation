@@ -228,8 +228,6 @@ def main():
         ("nb_filters_3", 80),
         ("filter_size_3", 3),
         ("stride_3", (1, 1)),
-         # Hyperparameter for the fourth hidden layer (FC)).
-        ("nb_units_4", args.patch_size),
      
         # Hyperparameters for Stochastic Gradient Descent.
         ("learning_rate", 0.05),
