@@ -12,7 +12,6 @@ from keras.layers.normalization import BatchNormalization
 from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
 from keras.constraints import maxnorm
 from keras.layers import Dropout
-from keras.utils import np_utils
 import os
 import pickle
 import numpy as np
@@ -33,7 +32,7 @@ def train_model(model, features, labels, patch_size, model_id, out_path,
     # about its source image and its position in the source. To train 
     # the model we extract just the patches
     X, y = get_matrix_form(features, labels, patch_size)
-    y_try = np_utils.to_categorical(y, 2)
+    
     X = normalise_input(X)
     print('Shape of X: {}, Shape of y: {}'.format(X.shape, y.shape))
     # Directory which is used to store the model and its weights.
@@ -57,7 +56,7 @@ def train_model(model, features, labels, patch_size, model_id, out_path,
     callbacks = [c for c in [earlystopper, checkpointer, tensorboarder] if c]
     
     print("Start training.")
-    history = model.fit(X, y_try, epochs=nb_epoch, callbacks=callbacks, validation_split=0.25)
+    history = model.fit(X, y, epochs=nb_epoch, callbacks=callbacks, validation_split=0.25)
     plot_history(history, out_path)
 
     save_model(model, model_dir)
@@ -137,24 +136,47 @@ def init_model(patch_size, model_id, architecture='one_layer',
         #-----------------------------------------------------------------
   
         #model = fcn_32s(patch_size, num_channels)
-        model.add(Conv2D(patch_size, (9, 9), subsample=(2,2), input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform'))
+        model.add(Conv2D(nb_filters_1, (9, 9), strides=(2,2), data_format = "channels_last", input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform'))
         #model.add(MaxPooling2D(pool_size=(2, 2), strides=1))
         model.add(Activation('relu'))
-        model.add(Conv2D(128, (5,5), subsample=(1,1)))
+        model.add(Conv2D(nb_filters_2, (5,5), strides=(1,1)))
         model.add(Activation('relu'))
         #model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Flatten())
         model.add(Dense(patch_size * patch_size))
         model.add(Activation('sigmoid'))
         
-    if architecture == 'two_layer':
+    elif architecture == 'experiment':
         #-----------------------------------------------------------------
   
         #model = fcn_32s(patch_size, num_channels)
-        model.add(Conv2D(patch_size, (9, 9), subsample=(2,2), input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform'))
+        model.add(Conv2D(nb_filters_1, (filter_size_1, filter_size_1), strides=(2,2), data_format="channels_last", input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform'))
         #model.add(MaxPooling2D(pool_size=(2, 2), strides=1))
         model.add(Activation('relu'))
-        model.add(Conv2D(128, (5,5), subsample=(1,1)))
+        model.add(Conv2D(nb_filters_1, (filter_size_1, filter_size_1), strides=(1,1)))
+        model.add(Activation('relu'))
+        model.add(Conv2D(nb_filters_2, (filter_size_2, filter_size_2)))
+        model.add(Activation('relu'))
+        model.add(Conv2D(nb_filters_2, (filter_size_2, filter_size_2), strides=(1,1)))
+        model.add(Activation('relu'))
+        #model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Flatten())
+        model.add(Dense(patch_size * patch_size))
+        model.add(Activation('sigmoid'))
+        
+        #-----------------------------------------------------------------------------------------
+    elif architecture == 'two_layer':
+        #-----------------------------------------------------------------
+  
+        #model = fcn_32s(patch_size, num_channels)
+        model.add(Conv2D(nb_filters_1, (9, 9), stride=(2,2), input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform'))
+        #model.add(MaxPooling2D(pool_size=(2, 2), strides=1))
+        model.add(Activation('relu'))
+        #model.add(Conv2D(nb_filters_1, (9,9), subsample=(2,2)))
+        #model.add(Activation('relu'))
+        #model.add(Conv2D(nb_filters_2, (5,5), subsample=(1,1)))
+        #model.add(Activation('relu'))
+        model.add(Conv2D(nb_filters_2, (5,5), subsample=(1,1)))
         model.add(Activation('relu'))
         #model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Flatten())
@@ -166,24 +188,21 @@ def init_model(patch_size, model_id, architecture='one_layer',
     elif architecture == 'mnih':
         model.add(
             Conv2D(
-                nb_filters_1, filter_size_1,
-                filter_size_1, subsample=stride_1,
+                nb_filters_1, (filter_size_1, filter_size_1), strides=stride_1,
                 input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform', activation='relu'))
         #model.add(Activation('relu'))
-        model.add(MaxPooling2D(pool_size=pool_size_1))
+        #model.add(MaxPooling2D(pool_size=pool_size_1))
         model.add(
             Conv2D(
-                nb_filters_2, filter_size_2,
-                filter_size_2, subsample=stride_2, activation='relu'))
+                nb_filters_2, (filter_size_2, filter_size_2), strides=stride_2, activation='relu'))
         #model.add(Activation('relu'))
         model.add(
             Conv2D(
-                nb_filters_3, filter_size_3,
-                filter_size_3, subsample=stride_3, activation='relu'))
+                nb_filters_3, (filter_size_3, filter_size_3), strides=stride_3, activation='relu'))
         #model.add(Activation('relu'))
         model.add(Flatten())
-        model.add(Dense(patch_size * patch_size, activation='relu'))
-        model.add(Dense(256, activation='softmax'))
+        model.add(Dense(patch_size * patch_size, activation='sigmoid'))
+        #model.add(Dense(256, activation='sigmoid'))
         #model.add(Activation('sigmoid'))
   
    

@@ -60,7 +60,7 @@ def create_parser():
         "-a", "--architecture",
         dest="architecture",
         default=False,
-        choices=["one_layer", "mnih", "two_layer", "one_layer_pool_2", "one_layer_pool_3", "one_layer_pool_4", "one_layer_filter_12",
+        choices=["one_layer", "experiment", "mnih", "two_layer", "one_layer_pool_2", "one_layer_pool_3", "one_layer_pool_4", "one_layer_filter_12",
                 "one_layer_filter_16", "one_layer_filter_20", "two_layer_pool_2", "two_layer_pool_3", "two_layer_pool_4",
                 "two_layer_filter_3", "two_layer_filter_4", "two_layer_filter_5", "two_layer_filter_6"],
         help="Neural net architecture.")
@@ -236,7 +236,7 @@ def main():
         ]
     
     if args.init_model:
-        model = init_model(args.patch_size, model_id, **dict(hyperparameters_mnih))
+        model = init_model(args.patch_size, model_id, **dict(hyperparameters))
         save_model_summary(hyperparameters, model, model_dir)
     elif args.train_model or args.evaluate_model:
         hyperparameters = dict(hyperparameters)
