@@ -27,12 +27,13 @@ def create_patches(feature_data, label_data, patch_size, path_to_geotiff, path_t
     # Cartesian projection of all the possible row and column indexes. This
     # gives all possible left-upper positions of our patches.
     #patch_indexes = itertools.product(range(0, rows, patch_size), range(0, cols, patch_size))
-    for (row, col) in sliding_window(rows, cols, patch_size, step=16):
+    for (row, col) in sliding_window(rows, cols, patch_size, step=32):
         in_bounds = row + patch_size < rows and col + patch_size < cols #returns boolean
         if in_bounds:
             new_patch_label = label_data[row:row + patch_size, col:col + patch_size] 
+            new_patch_label = cv2.resize(new_patch_label, (16, 16))
             #if new_patch_label.sum() * 100/np.dot(patch_size, patch_size) >= distribution:
-            if new_patch_label.sum()>5: #5, #205, #410, 820
+            if new_patch_label.sum()>1: #5, #205, #410, 820
                 #new_patch_label = transform(new_patch_label, flip=True, mirror=True,rotations=[45])
                 new_patch_feature = feature_data[row:row + patch_size, col:col + patch_size]
                 #new_patch_feature = transform(new_patch_feature, flip=True, mirror=True,rotations=[45])
@@ -93,8 +94,8 @@ def image_from_patches(patches, patch_size, image_shape):
     #image = cv2.resize(image, (1500, 1500))
     #print('image_from_patches shape: ', image.shape)
     for patch, (row, col), _ in patches:
-        patch = np.reshape(patch, (patch_size, patch_size))
-        image[row:row + patch_size, col:col + patch_size] = patch
+        patch = np.reshape(patch, (16, 16))
+        image[row:row + 16, col:col + 16] = patch
     return image
 
 def overlay_bitmap(bitmap, raster_dataset, out_path, color='blue'):

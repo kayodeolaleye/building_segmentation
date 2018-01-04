@@ -220,6 +220,7 @@ def main():
         ("stride_1", (4, 4)),
         # Hyperparameter for the first pooling layer.
         ("pool_size_1", (2, 2)),
+        ("pool_stride", 1),
         # Hyperparameter for the second convolutional layer).
         ("nb_filters_2", 112),
         ("filter_size_2", 4),
@@ -236,10 +237,10 @@ def main():
         ]
     
     if args.init_model:
-        model = init_model(args.patch_size, model_id, **dict(hyperparameters))
-        save_model_summary(hyperparameters, model, model_dir)
+        model = init_model(args.patch_size, model_id, **dict(hyperparameters_mnih))
+        save_model_summary(hyperparameters_mnih, model, model_dir)
     elif args.train_model or args.evaluate_model:
-        hyperparameters = dict(hyperparameters)
+        hyperparameters = dict(hyperparameters_mnih)
         model = load_model(model_id)
         model = compile_model(model, hyperparameters["learning_rate"], hyperparameters['momentum'], hyperparameters["decay"])
         

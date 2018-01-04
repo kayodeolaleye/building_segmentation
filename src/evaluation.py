@@ -20,7 +20,7 @@ def evaluate_model(model, features, labels, patch_size, out_path, out_format='Ge
     print('_' * 100)
     print('Start evaluating model.')
     
-    X, y_true = get_matrix_form(features, labels, patch_size)
+    X, y_true = get_matrix_form(features, labels, 16)
     X = normalise_input(X)
     #print("CHECK IF X IS NORMALIZED: ", X)
     #print('Model Metric Names: ', model.metrics_names)

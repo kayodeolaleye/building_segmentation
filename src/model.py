@@ -31,7 +31,7 @@ def train_model(model, features, labels, patch_size, model_id, out_path,
     # to the function, Each tuple contains the patch and information
     # about its source image and its position in the source. To train 
     # the model we extract just the patches
-    X, y = get_matrix_form(features, labels, patch_size)
+    X, y = get_matrix_form(features, labels, 16)
     
     X = normalise_input(X)
     print('Shape of X: {}, Shape of y: {}'.format(X.shape, y.shape))
@@ -56,7 +56,7 @@ def train_model(model, features, labels, patch_size, model_id, out_path,
     callbacks = [c for c in [earlystopper, checkpointer, tensorboarder] if c]
     
     print("Start training.")
-    history = model.fit(X, y, epochs=nb_epoch, callbacks=callbacks, validation_split=0.25)
+    history = model.fit(X, y, epochs=nb_epoch, batch_size = 128, callbacks=callbacks, validation_split=0.25)
     plot_history(history, out_path)
 
     save_model(model, model_dir)
@@ -122,7 +122,7 @@ def fcn_32s(patch_size, num_channels):
     return model
 
 def init_model(patch_size, model_id, architecture='one_layer',
-               nb_filters_1=64, filter_size_1=12, pool_size_1=2,
+               nb_filters_1=64, filter_size_1=12, pool_size_1=2, pool_stride=1,
                stride_1=(4, 4), nb_filters_2=128, filter_size_2=4,
                stride_2=(1,1), nb_filters_3=64, filter_size_3=12,
                stride_3=(4, 4), learning_rate=0.05,
@@ -188,21 +188,21 @@ def init_model(patch_size, model_id, architecture='one_layer',
     elif architecture == 'mnih':
         model.add(
             Conv2D(
-                nb_filters_1, (filter_size_1, filter_size_1), strides=stride_1,
+                nb_filters_1, (filter_size_1, filter_size_1), strides=stride_1, padding='same',
                 input_shape=(patch_size, patch_size, num_channels), kernel_initializer='glorot_uniform', activation='relu'))
         #model.add(Activation('relu'))
-        #model.add(MaxPooling2D(pool_size=pool_size_1))
+        model.add(MaxPooling2D(pool_size=pool_size_1, strides=pool_stride, padding='same'))
         model.add(
             Conv2D(
-                nb_filters_2, (filter_size_2, filter_size_2), strides=stride_2, activation='relu'))
+                nb_filters_2, (filter_size_2, filter_size_2), strides=stride_2, padding='same', activation='relu'))
         #model.add(Activation('relu'))
         model.add(
             Conv2D(
-                nb_filters_3, (filter_size_3, filter_size_3), strides=stride_3, activation='relu'))
+                nb_filters_3, (filter_size_3, filter_size_3), strides=stride_3, padding='same', activation='relu'))
         #model.add(Activation('relu'))
         model.add(Flatten())
-        model.add(Dense(patch_size * patch_size, activation='sigmoid'))
-        #model.add(Dense(256, activation='sigmoid'))
+        model.add(Dense(patch_size * patch_size, activation='relu'))
+        model.add(Dense(256, activation='sigmoid'))
         #model.add(Activation('sigmoid'))
   
    
