@@ -19,7 +19,7 @@ Please take a look at the config.py file to see which shapefiles belong to which
 You can clone the repository using the command: `git clone https://github.com/kayodeolaleye/building_segmentation.git`
 
 ### Running it
-`$ cd building_segmentation_count/src`
+`$ cd building_segmentation/src`
 
 `$ mkdir data`
 
