@@ -19,13 +19,13 @@ Please take a look at the config.py file to see which shapefiles belong to which
 You can clone the repository using the command: `git clone https://github.com/kayodeolaleye/building_segmentation.git`
 
 ### Running it
-
+  
   cd building_segmentation/src
   mkdir data
   python buildingNets.py --setup
   python buildingNets.py -p
   python buildingNets.py -a 'one_layer' -i -t -E -C -T -v -e
-
+  
 ## Acknowledgements
 [WaterNet](https://github.com/treigerm/WaterNet) from [Treigerm](https://github.com/treigerm) helped a lot to get started on this project. 
 
